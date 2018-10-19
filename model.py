@@ -1,24 +1,27 @@
 #!/usr/bin/env python3
 from keras.models import Sequential
-from keras.layers import Dense, Flatten, Lambda, Conv2D, Dropout, MaxPool2D, Cropping2D, Activation
-from keras.optimizers import SGD
-from keras.callbacks import ModelCheckpoint, TensorBoard
+from keras.layers import Dense, Flatten, Lambda, Conv2D, Dropout, Cropping2D,
+from keras.callbacks import ModelCheckpoint
 import keras.backend as K
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
-import cv2
 import helpers
 import sys
 
 
 def balance(lines):
+    """
+    Removes skewed data. Recorder dataset contains mainly ~0.0 angle
+    (driving straight ahead). 
+    """
     balanced = []
     hist = np.histogram([line[1] for line in lines], 100)
     bins_len = len(hist[0])
-    mean = np.mean(hist[0], 0)
+
+    # grouping samples by histogram ranges
     ranges = [(hist[1][i], hist[1][i+1]) for i in range(bins_len)]
     grouped = {}
     for i in range(bins_len):
@@ -31,6 +34,11 @@ def balance(lines):
             elif r[0] <= line[1] < r[1]:
                 grouped[i].append(line)
 
+    # mean value is good here - neither too high (like std deviation)
+    # nor too low (like median)
+    mean = np.mean(hist[0], 0)
+
+    # all ranges are clipped up to median value
     balanced = [grouped[i][:int(mean)] for i in range(bins_len)]
 
     return [line for lines in balanced for line in lines]
@@ -77,8 +85,9 @@ train_samples, valid_samples = train_test_split(lines, test_size=0.2)
 print('Training set: {}'.format(len(train_samples)))
 print('Validation set: {}'.format(len(valid_samples)))
 
-plt.hist([t[1] for t in train_samples], bins=100)
-plt.show()
+# # Visualization
+# plt.hist([t[1] for t in train_samples], bins=100)
+# plt.show()
 
 EPOCHS = 10
 BATCH_SIZE = 32
@@ -86,22 +95,24 @@ BATCH_SIZE = 32
 train_generator = helpers.generator(train_samples, BATCH_SIZE)
 valid_generator = helpers.generator(valid_samples, BATCH_SIZE)
 
-sample = next(train_generator)
+# # Visualization
+# sample = next(train_generator)
+# sample_data = sample[0][:10]
+# sample_labels = sample[1][:10]
+# fig, ax = plt.subplots(2, 5)
+# for i in range(0, 5):
+#     ax[0][i].imshow(sample_data[i])
+#     ax[0][i].set_title(sample_labels[i])
+# for i in range(5, 10):
+#     ax[1][i-5].imshow(sample_data[i])
+#     ax[1][i-5].set_title(sample_labels[i])
+# plt.show()
 
-sample_data = sample[0][:10]
-sample_labels = sample[1][:10]
-fig, ax = plt.subplots(2, 5)
-for i in range(0, 5):
-    ax[0][i].imshow(sample_data[i])
-    ax[0][i].set_title(sample_labels[i])
-for i in range(5, 10):
-    ax[1][i-5].imshow(sample_data[i])
-    ax[1][i-5].set_title(sample_labels[i])
-plt.show()
+# helpers.visualize(model, 'crop', 'resize', sample_data, sample_labels)
+# helpers.visualize(model, 'yuv', 'yuv', sample_data, sample_labels)
 
-helpers.visualize(model, 'crop', 'resize', sample_data, sample_labels)
-helpers.visualize(model, 'yuv', 'yuv', sample_data, sample_labels)
-
+# The best fit is captured, so there is no risk
+# of overwriting model with less optimal state in next epoch
 best = ModelCheckpoint('model.h5', verbose=1, save_best_only=True)
 
 history = model\

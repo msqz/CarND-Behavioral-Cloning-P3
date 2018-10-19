@@ -55,7 +55,9 @@ def read_lines(*paths):
             for line in reader:
                 center_measurement = round(float(line[3]), 2)
                 lines.append((line[0].strip(), center_measurement))
-                # Min/max - to kepp from exceeding angle (-1.0, 1.0)
+
+                # min(), max() - to keep the corrected angle
+                # from exceeding (-1.0, 1.0) range
                 left_measurement = round(center_measurement + CORRECTION, 2)
                 lines.append((line[1].strip(), min(1, left_measurement)))
                 right_measurement = round(center_measurement - CORRECTION, 2)
@@ -77,6 +79,10 @@ def read_lines(*paths):
 
 
 def load(lines, limit=None, offset=None):
+    """
+    Augmentation happens here. Every additional set
+    gets its own augmentation (flip, blur, flip+blur)
+    """
     start = offset or 0
     end = (limit and start + limit) or len(lines)
 
