@@ -71,9 +71,9 @@ The model used an adam optimizer, so the learning rate was not tuned manually (m
 
 #### 4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used the recorded driving on first track and the data provided in lecture.
+Training data was chosen to keep the vehicle driving on the road. I used the recorded driving on first track and the sample data provided in lecture.
 
-For details about how I created the training data, see the next section. 
+For details about how I created the training data, see the paragraph 3. 
 
 ### Model Architecture and Training Strategy
 
