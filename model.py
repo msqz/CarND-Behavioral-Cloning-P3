@@ -87,7 +87,20 @@ train_generator = helpers.generator(train_samples, BATCH_SIZE)
 valid_generator = helpers.generator(valid_samples, BATCH_SIZE)
 
 sample = next(train_generator)
-helpers.visualize(model, 'crop', 'resize', sample[0], sample[1])
+
+sample_data = sample[0][:10]
+sample_labels = sample[1][:10]
+fig, ax = plt.subplots(2, 5)
+for i in range(0, 5):
+    ax[0][i].imshow(sample_data[i])
+    ax[0][i].set_title(sample_labels[i])
+for i in range(5, 10):
+    ax[1][i-5].imshow(sample_data[i])
+    ax[1][i-5].set_title(sample_labels[i])
+plt.show()
+
+helpers.visualize(model, 'crop', 'resize', sample_data, sample_labels)
+helpers.visualize(model, 'yuv', 'yuv', sample_data, sample_labels)
 
 best = ModelCheckpoint('model.h5', verbose=1, save_best_only=True)
 

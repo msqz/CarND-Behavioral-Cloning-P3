@@ -15,6 +15,19 @@ CORRECTION = 0.2
 
 
 def visualize(model, from_layer, to_layer, data, labels):
+    """
+    Displays the result of processing data in a sequence of layers
+
+    :param model: model containing layers
+
+    :param from_layer: entry point for visualization
+
+    :param to_layer: layer which result gonna be visualized
+
+    :param data: samples
+
+    :param labels: labels
+    """
     result = K.function([model.get_layer(from_layer).input],
                         [model.get_layer(to_layer).output])([data])[0]
 
@@ -29,6 +42,12 @@ def visualize(model, from_layer, to_layer, data, labels):
 
 
 def read_lines(*paths):
+    """
+    Read CSV files content.
+    Multiples the total number of lines (in all files) by 4.
+
+    :param *paths: source files paths
+    """
     lines = []
     for path in paths:
         with open(path) as f:
